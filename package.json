@@ -37,6 +37,7 @@
     "tiktok-scraper": "^1.4.36",
     "tinyurl": "^1.1.7",
     "xfarr-api": "^3.0.1",
+    "uuid": "^3.3.2"
     "yt-search": "^2.13.1",
     "ytdl-core": "^4.11.5",
     "zod": "^3.22.2"
