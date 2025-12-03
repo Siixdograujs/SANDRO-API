@@ -62,7 +62,7 @@ const playStoreSearch = (query) => new Promise((resolve, reject) => {
 })
 
 // OpenAi - ChatGPT - Feita por Vitinho ️🤸🏻‍♂️
-//const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const InArtificial = async (query) => {
 let response = await fetch('https://api.openai.com/v1/completions', {
