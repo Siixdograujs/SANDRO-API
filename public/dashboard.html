@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Dashboard privado</h1>
+      <div id="info">Carregando...</div>
+      <button id="logout" class="btn" style="width:auto;margin-top:18px">Sair</button>
+    </div>
+  </div>
+
+  <script>
+    async function load(){
+      const res = await fetch('/api/me');
+      const info = document.getElementById('info');
+      if (!res.ok) {
+        info.innerHTML = 'Não autorizado. Faça login. <a href="/login.html" class="link">Entrar</a>';
+        return;
+      }
+      const data = await res.json();
+      info.innerHTML = `Olá <b>${data.username}</b> <br>Conta criada: ${new Date(data.createdAt).toLocaleString()} <br> Email: ${data.email || '—'}`;
+    }
+
+    document.getElementById('logout').addEventListener('click', async ()=>{
+      await fetch('/api/logout', { method: 'POST' });
+      location.href = '/login.html';
+    });
+
+    load();
+  </script>
+</body>
+</html>

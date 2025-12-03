@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registrar</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Registrar</h1>
+      <form id="registerForm" class="centered">
+        <input class="input" name="username" placeholder="Insira o nome de Usuário" required />
+        <input class="input" name="password" type="password" placeholder="Insira Sua Senha" required />
+        <input class="input" name="email" type="email" placeholder="Seu E-mail" required />
+        <p class="help">Um código de verificação será enviado pro seu email</p>
+        <button class="btn" type="submit">Registrar</button>
+      </form>
+      <p class="help">Já tem uma conta? <a class="link" href="/login.html">Entrar</a></p>
+      <p id="msg" style="color:#ffb3b3;margin-top:8px"></p>
+    </div>
+  </div>
+
+  <script>
+    const msg = document.getElementById('msg');
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.textContent = '';
+      const f = e.target;
+      const body = {
+        username: f.username.value.trim(),
+        password: f.password.value,
+        email: f.email.value.trim()
+      };
+      try {
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: {'content-type':'application/json'},
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) { msg.textContent = data.error || 'Erro'; return; }
+        msg.style.color = '#bff0ff';
+        msg.textContent = 'Registrado com sucesso! (código enviado) Redirecionando...';
+        setTimeout(()=> location.href = '/dashboard', 900);
+      } catch (err) {
+        msg.textContent = 'Erro de conexão';
+      }
+    });
+  </script>
+</body>
+</html>
