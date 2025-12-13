@@ -73,10 +73,10 @@ const { xvideos } = require('./modulos-api/xvideos.js');
 const { xnxxsearch } = require('./modulos-api/xnxx.js');
 const yts = require('yt-search');
 var { ytSearch } = require('./lib/yt.js')
-const { youtubedl } = require('./node_modules/@bochilteam/scraper-sosmed/lib/cjs/src/youtube.js');
+const youtubedl = require('@distube/ytdl-core');
+//const { youtubedl } = require('./node_modules/@bochilteam/scraper-sosmed/lib/cjs/src/youtube.js');
 
-
-var criador = "SANDRO BOT"
+var criador = "HIMURU APIS"
 var apicuttly = ['2038c1a7754b408aa8f9055282638c00e668e','4786cc6a0f19de9c67ea6a4282c494323c932','89d73b3a07209177d0251e30d49d66bd669ac','e841147455d0fdfbf50f74aefe63b6728adc0','27f3aa3f45cb4460bcbac69b782ca470a4570','31a8df09d5a9d8d009790df0b5642e3d76919','09b4e764ff07b10eac1682e71aaf95a78f358','75fe576ce040b619176af22f5a718b2f574f5','e24ee36f9c1519c0a779667a5182a31fb7ccf','903869065d29e23455ddca922071f4bbeb133']
 var apibitly = ['2243940c230ad0d748059aee58ddf126b65fd8e7','6cfc18e9bfa554714fadc10a1f6aff7555642348','c71b6658a1d271ddaf2a5077de3dcb9d67f68025','cddbceccdc2f1c9d11e4cdd0d2b1d1078e447c43','7915c671fbd90eca96310e5c9442d761225a1080','e5dee46eb2d69fc9f4b0057266226a52a3555356','f09ab8db9cf778b37a1cf8bc406eee5063816dec','964080579f959c0cc3226b4b2053cd6520bb60ad','a4f429289bf8bf6291be4b1661df57dde5066525','3d48e2601f25800f375ba388c30266aad54544ae','4854cb9fbad67724a2ef9c27a9d1a4e9ded62faa','d375cf1fafb3dc17e711870524ef4589995c4f69','43f58e789d57247b2cf285d7d24ab755ba383a28','971f6c6c2efe6cb5d278b4164acef11c5f21b637','ae128b3094c96bf5fd1a349e7ac03113e21d82c9','e65f2948f584ffd4c568bf248705eee2714abdd2','08425cf957368db9136484145aa6771e1171e232','dc4bec42a64749b0f23f1a8f525a69184227e301','0f9eb729a7a08ff5e73fe1860c6dc587cc523035','037c5017712c8f5f154ebbe6f91db1f82793c375']
 var translate = (text, lang) => { return new Promise(async (resolve, reject) => { trans(text, { conn: 'gtx', to: lang }).then((res) => resolve(res.text)).catch((err) => reject(err)) });}
@@ -100,7 +100,7 @@ reject(err)
 })
 })
 
-const banner = cfonts.render(("POWER|APIS"), {
+const banner = cfonts.render(("HIMURU|APIS"), {
 font: "block",
 align: "center",
 gradient: ["magenta","red"]
@@ -7001,24 +7001,42 @@ console.log(err)
 })
 
 
-app.get('/youtube/mp3', async (req, res, next) => {
-apikey = req.query.apikey
-if(key[key.map(i => i?.apikey)?.indexOf(apikey)]?.request <= 0) return res.sendFile(path.join(__dirname, "./public/", "limited.html"))
-if(!apikey)return res.json({resultado:'Cade o parametro apikey?'})
-if(!key.map(i => i.apikey)?.includes(apikey))return res.sendFile(path.join(__dirname, "./public/", "limited.html"))
-await listkeys(apikey, req);
-url = req.query.url
-if(!url)return res.json({status:false, resultado:'Cade o parametro url??'  }) 
+const ytdl = require('@distube/ytdl-core');
+const tmpDir = path.join(os.tmpdir(), 'youtube-audio');
+if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+let cookiesAgent = null;
 try {
-const down = await youtubedl(url);
-const audio = await down.audio['128kbps'].download();
-data = await fetch(audio).then(v => v.buffer())   
-await fs.writeFileSync(bla+'/tmp/asupan.mp4', data)
-res.sendFile(bla+'/tmp/asupan.mp4')
-} catch (err) {
-console.log(err)
-};
+const rawCookies = JSON.parse(fs.readFileSync('./data/cookies.json', 'utf8'));
+const cookies = rawCookies.map(c => ({
+name: c.name,
+value: c.value
+}));
+cookiesAgent = ytdl.createAgent(cookies);
+console.log('Cookies carregados com sucesso (formato corrigido)');
+} catch (e) {
+console.log('Erro ao carregar cookies:', e.message);
+}
+const proxyUri = 'http://p.webshare.io:80'; 
+let proxyAgent = null;
+if (proxyUri) {
+proxyAgent = ytdl.createProxyAgent({ uri: proxyUri });
+console.log('Proxy ativado:', proxyUri);
+}
+
+app.get('/youtube/mp3', (req, res) => {
+const url = req.query.url;
+res.setHeader(
+'Content-Disposition',
+'attachment; filename="audio.mp3"');
+res.setHeader('Content-Type', 'audio/mpeg');
+const yt = exec('yt-dlp', ['--no-playlist','-f', 'bestaudio','-o', '-',url]);
+yt.stdout.pipe(res);
+yt.stderr.on('data', () => {});
 });
+
+
+
+
 
 app.get('/youtube/mp4', async (req, res, next) => {
 apikey = req.query.apikey
