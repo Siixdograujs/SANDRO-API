@@ -7030,7 +7030,7 @@ res.setHeader(
 'Content-Disposition',
 'attachment; filename="audio.mp3"');
 res.setHeader('Content-Type', 'audio/mpeg');
-const yt = exec('yt-dlp', ['--no-playlist','-f', 'bestaudio','-o', '-',url]);
+const yt = spawn('yt-dlp', ['--no-playlist','-f', 'bestaudio','-o', '-',url]);
 yt.stdout.pipe(res);
 yt.stderr.on('data', () => {});
 });
