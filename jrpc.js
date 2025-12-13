@@ -29,6 +29,7 @@ var gerarnick = require('./lib/gerarnick.js')
 var { mediafireDl } = require('./lib/mediafire.js');
 var buffer = require('./lib/upload.js')
 var exec = require('child_process');
+const { spawn } = require("child_process");
 const imagemaker = require('imagemaker.js');
 var { pinterestVideoV2 } = require('./modulos-api/pinterest.js') 
 var download = require('@phaticusthiccy/open-apis')
