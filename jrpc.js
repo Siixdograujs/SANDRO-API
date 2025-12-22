@@ -7024,15 +7024,26 @@ proxyAgent = ytdl.createProxyAgent({ uri: proxyUri });
 console.log('Proxy ativado:', proxyUri);
 }
 
-app.get('/youtube/mp3', (req, res) => {
-const url = req.query.url;
-res.setHeader(
-'Content-Disposition',
-'attachment; filename="audio.mp3"');
-res.setHeader('Content-Type', 'audio/mpeg');
-const yt = spawn('yt-dlp', ['--no-playlist','-f', 'bestaudio','-o', '-',url]);
-yt.stdout.pipe(res);
-yt.stderr.on('data', () => {});
+
+app.get('/youtube/mp3', async (req, res) => {
+  try {
+    const url = req.query.url;
+    if (!ytdl.validateURL(url)) {
+      return res.status(400).json({ error: 'URL inválida' });
+    }
+
+    res.setHeader('Content-Disposition', 'attachment; filename="audio.mp3"');
+    res.setHeader('Content-Type', 'audio/mpeg');
+
+    ytdl(url, {
+      filter: 'audioonly',
+      quality: 'highestaudio',
+      agent: cookiesAgent || undefined
+    }).pipe(res);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 
